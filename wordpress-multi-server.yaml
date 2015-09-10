@@ -49,6 +49,11 @@ parameter_groups:
 
 parameters:
 
+  rackconnect_network_name:
+    label: rackconnected network name
+    description: rackconnected network name
+    type: string
+
   # Server settings
   load_balancer_hostname:
     label: Load Balancer Hostname
@@ -404,6 +409,9 @@ resources:
       flavor: { get_param: database_server_flavor }
       image: { get_param: image }
       key_name: { get_resource: ssh_key }
+      networks:
+      - network: {get_param: rackconnect_network_name}
+      - uuid: 11111111-1111-1111-1111-111111111111      
       metadata:
         rax-heat: { get_param: "OS::stack_id" }
 
@@ -437,6 +445,9 @@ resources:
       key_name: { get_resource: ssh_key }
       config_drive: true
       user_data_format: RAW
+      networks:
+      - network: {get_param: rackconnect_network_name}
+      - uuid: 11111111-1111-1111-1111-111111111111      
       user_data:
         get_attr: [ cloud_monitoring_config, config ]
       metadata:
@@ -517,6 +528,7 @@ resources:
           kitchen: { get_param: kitchen }
           chef_version: { get_param: chef_version }
           parent_stack_id: { get_param: "OS::stack_id" }
+          rackconnect_network_name: {get_param: rackconnect_network_name}
 
   # Chef resources
   database_server_setup:
@@ -707,11 +719,11 @@ outputs:
     description: WordPress Password
 
   database_server_ip:
-    value: { get_attr: [database_server, accessIPv4] }
+    value: { get_attr: [database_server, networks, private, 0] }
     description: Database Server IP
 
   wordpress_web_master_ip:
-    value: { get_attr: [wp_master_server, accessIPv4] }
+    value: { get_attr: [wp_master_server, networks, private, 0] }
     description: Web-Master IP
 
   wordpress_web_ips:
