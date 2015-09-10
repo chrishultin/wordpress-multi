@@ -5,6 +5,11 @@ description: |
 
 parameters:
 
+  rackconnect_network_name:
+    label: rackconnected network name
+    description: rackconnected network name
+    type: string
+
   # Server settings
 
   agent_config:
@@ -186,6 +191,9 @@ resources:
       config_drive: true
       user_data_format: RAW
       user_data: { get_param: agent_config }
+      networks:
+      - network: {get_param: rackconnect_network_name}
+      - uuid: 11111111-1111-1111-1111-111111111111      
       metadata:
         rax-heat: { get_param: parent_stack_id }
 
@@ -303,7 +311,11 @@ resources:
 
 outputs:
   accessIPv4:
-    value: { get_attr: [wp_web_server, accessIPv4] }
+    value: { get_attr: [wp_web_server, networks, private, 0] }
 
   privateIPv4:
     value: { get_attr: [wp_web_server, networks, private, 0] }
+    
+  rackconnectIPv4:
+    value: { get_attr: [mongodb_peer_server, networks, {get_param: rackconnect_network_name}, 0] }
+    description: the rackconnect ip of the peer server
