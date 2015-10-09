@@ -179,6 +179,14 @@ parameters:
     type: string
     default: "none"
 
+  # RCv3 Settings
+  rackconnect_lb_pool:
+    label: RackConnect Load Balancer Pool
+    description: Name or ID of the Pool on the RackConnected Load Balancer to add these servers to.  If you do not have one configured, you will need to reach out to Rackspace Support to have one configured for you.
+    type: string
+    constraints:
+      -custom_constraint: rackconnect.pool
+
 resources:
 
   wp_web_server:
@@ -308,6 +316,14 @@ resources:
                    "recipe[rax-wordpress::varnish]",
                    "recipe[rax-wordpress::firewall]",
                    "recipe[rax-wordpress::lsyncd-client]"]
+
+  load_balancer:
+    type: "Rackspace::RackConnect::PoolNode"
+    depends_on:
+      - wp_web_server_setup
+    properties:
+      pool: rackconnect_lb_pool
+      server_id: { get_resource: wp_web_server }
 
 outputs:
   accessIPv4:

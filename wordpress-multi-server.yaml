@@ -15,6 +15,8 @@ parameter_groups:
 - label: Server Settings
   parameters:
   - image
+  - rackconnect_network_name
+  - rackconnect_lb_pool
 
 - label: Web Server Settings
   parameters:
@@ -50,9 +52,18 @@ parameter_groups:
 parameters:
 
   rackconnect_network_name:
-    label: rackconnected network name
-    description: rackconnected network name
+    label: RackConnect Network
+    description: Name of the RackConnected Network to attach this server to
     type: string
+    constraints:
+      - custom_constraint: rackconnect.networka
+
+  rackconnect_lb_pool:
+    label: RackConnect Load Balancer Pool
+    description: Name or ID of the Pool on the RackConnected Load Balancer to add these servers to.  If you do not have one configured, you will need to reach out to Rackspace Support to have one configured for you.
+    type: string
+    constraints:
+      - custom_constraint: rackconnect.pool
 
   # Server settings
   load_balancer_hostname:
@@ -371,36 +382,39 @@ resources:
       save_private_key: true
 
   # Server resources
+#  load_balancer:
+#    type: "Rackspace::Cloud::LoadBalancer"
+#    depends_on:
+#    - wp_master_server_setup
+#    - wp_web_servers
+#    properties:
+#      name: { get_param: load_balancer_hostname }
+#      nodes:
+#      - addresses: [ { get_attr: [wp_master_server, networks, private, 0] } ]
+#        port: 80
+#        condition: ENABLED
+#      - addresses: { get_attr: [wp_web_servers, privateIPv4] }
+#        port: 80
+#        condition: ENABLED
+#      healthMonitor:
+#        type: HTTP
+#        delay: 10
+#        timeout: 5
+#        attemptsBeforeDeactivation: 2
+#        path: /
+#        statusRegex: ^[23]0[0-2]$
+#      port: 80
+#      protocol: HTTP
+#      algorithm: ROUND_ROBIN
+#      contentCaching: ENABLED
+#      virtualIps:
+#      - type: PUBLIC
+#        ipVersion: IPV4
+#      metadata:
+#        rax-heat: { get_param: "OS::stack_id" }
+
   load_balancer:
-    type: "Rackspace::Cloud::LoadBalancer"
-    depends_on:
-    - wp_master_server_setup
-    - wp_web_servers
-    properties:
-      name: { get_param: load_balancer_hostname }
-      nodes:
-      - addresses: [ { get_attr: [wp_master_server, networks, private, 0] } ]
-        port: 80
-        condition: ENABLED
-      - addresses: { get_attr: [wp_web_servers, privateIPv4] }
-        port: 80
-        condition: ENABLED
-      healthMonitor:
-        type: HTTP
-        delay: 10
-        timeout: 5
-        attemptsBeforeDeactivation: 2
-        path: /
-        statusRegex: ^[23]0[0-2]$
-      port: 80
-      protocol: HTTP
-      algorithm: ROUND_ROBIN
-      contentCaching: ENABLED
-      virtualIps:
-      - type: PUBLIC
-        ipVersion: IPV4
-      metadata:
-        rax-heat: { get_param: "OS::stack_id" }
+    type: "Rackspace::RackConnect::PoolNode"
 
   database_server:
     type: "OS::Nova::Server"
@@ -529,6 +543,7 @@ resources:
           chef_version: { get_param: chef_version }
           parent_stack_id: { get_param: "OS::stack_id" }
           rackconnect_network_name: {get_param: rackconnect_network_name}
+          rackconnect_lb_pool: { get_param: rackconnect_lb_pool }
 
   # Chef resources
   database_server_setup:
