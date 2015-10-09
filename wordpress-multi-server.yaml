@@ -522,11 +522,11 @@ resources:
           # ssl_certificate: { get_param: ssl_certificate }
           # ssl_intermediate_certs: { get_param: ssl_intermediate_certs }
           lsync_pub: { get_attr: [sync_key, public_key]}
-          varnish_master_backend: { get_attr: [wp_master_server, networks, private, 0] }
+          varnish_master_backend: { get_attr: [wp_master_server, networks, { get_param: rackconnect_network_name } , 0] }
           prefix: { get_param: prefix }
           database_name: { get_param: database_name }
-          database_host: { get_attr: [database_server, networks, private, 0] }
-          memcached_host: { get_attr: [database_server, networks, private, 0] }
+          database_host: { get_attr: [database_server, networks, { get_param: rackconnect_network_name }, 0] }
+          memcached_host: { get_attr: [database_server, networks, { get_param: rackconnect_network_name } , 0] }
           username: { get_param: username }
           database_password: { get_attr: [database_password, value] }
           wp_auth: { get_attr: [wp_auth, value] }
@@ -562,15 +562,15 @@ resources:
               password: { get_attr: [mysql_root_password, value] }
         memcached:
           memory: 500
-          listen: { get_attr: [database_server, networks, private, 0] }
+          listen: { get_attr: [database_server, networks, { get_param: rackconnect_network_name }, 0] }
         mysql:
-          bind_address: { get_attr: [database_server, networks, private, 0] }
+          bind_address: { get_attr: [database_server, networks, { get_param: rackconnect_network_name }, 0] }
           server_root_password: { get_attr: [mysql_root_password, value] }
           server_repl_password: { get_attr: [mysql_repl_password, value] }
           server_debian_password: { get_attr: [mysql_debian_password, value] }
           remove_test_database: true
           remove_anonymous_users: true
-          root_network_acl: [ "10.%" ]
+          root_network_acl: [ "10.0.0.0/255.0.0.0", "192.168.0.0/255.255.0.0", "172.16.0.0/255.240.0.0"]
         rax:
           firewall:
             tcp: [22]
@@ -642,7 +642,8 @@ resources:
             name: { get_param: database_name }
             user: { get_param: username }
             pass: { get_attr: [database_password, value] }
-            host: { get_attr: [database_server, networks, private, 0] }
+            host: { get_attr: [database_server, networks, { get_param: rackconnect_network_name }, 0] }
+            network_acl: ["10.0.0.0/255.0.0.0", "192.168.0.0/255.255.0.0", "172.16.0.0/255.240.0.0"]
           keys:
             auth: { get_attr: [wp_auth, value] }
             logged_in: { get_attr: [wp_logged_in, value] }
@@ -659,7 +660,7 @@ resources:
               private_key: { get_attr: [sync_key, private_key] }
             clients: { get_attr: [wp_web_servers, privateIPv4] }
           memcache:
-            server: { get_attr: [database_server, networks, private, 0] }
+            server: { get_attr: [database_server, networks, { get_param: rackconnect_network_name }, 0] }
           varnish:
             master_backend: "localhost"
           packages:
@@ -709,7 +710,7 @@ resources:
         rax:
           memcached:
             clients:
-            - { get_attr: [wp_master_server, networks, private, 0] }
+            - { get_attr: [wp_master_server, networks, { get_param: rackconnect_network_name }, 0] }
             - { get_attr: [wp_web_servers, privateIPv4] }
         run_list: ["recipe[rax-wordpress::memcached-firewall]"]
   load_balancer:
@@ -724,9 +725,9 @@ outputs:
     value: { get_attr: [ssh_key, private_key] }
     description: SSH Private IP
 
-  load_balancer_ip:
-    value: { get_attr: [load_balancer, virtual_ip] }
-    description: Load Balancer IP
+#  load_balancer_ip:
+#    value: { get_attr: [load_balancer, virtual_ip] }
+#    description: Load Balancer IP
 
   wordpress_user:
     value: { get_param: username }

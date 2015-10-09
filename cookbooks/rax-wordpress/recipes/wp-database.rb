@@ -41,10 +41,12 @@ mysql_database_user db['user'] do
   action        :create
 end
 
-mysql_database_user db['user'] do
-  connection    mysql_connection_info
-  database_name db['name']
-  privileges    [:all]
-  host          "10.%"
-  action        :grant
+db['network_acl'].each do |network|
+  mysql_database_user db['user'] do
+    connection    mysql_connection_info
+    database_name db['name']
+    privileges    [:all]
+    host          "#{network}"
+    action        :grant
+  end
 end
