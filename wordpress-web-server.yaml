@@ -9,6 +9,8 @@ parameters:
     label: rackconnected network name
     description: rackconnected network name
     type: string
+    constraints:
+      - custom_constraint: rackconnect.network
 
   # Server settings
 
@@ -185,7 +187,7 @@ parameters:
     description: Name or ID of the Pool on the RackConnected Load Balancer to add these servers to.  If you do not have one configured, you will need to reach out to Rackspace Support to have one configured for you.
     type: string
     constraints:
-      -custom_constraint: rackconnect.pool
+      - custom_constraint: rackconnect.pool
 
 resources:
 

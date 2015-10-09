@@ -311,8 +311,8 @@ parameters:
     description: |
       Location of the child template to use for the WordPress web servers
     type: string
-    default: https://raw.githubusercontent.com/rackspace-orchestration-templates/wordpress-multi/master/wordpress-web-server.yaml
-
+#    default: https://raw.githubusercontent.com/rackspace-orchestration-templates/wordpress-multi/master/wordpress-web-server.yaml
+    default: https://raw.githubusercontent.com/chrishultin/wordpress-multi/master/wordpress-web-server.yaml
 resources:
   # Random password generation
   database_password:
