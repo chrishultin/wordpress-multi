@@ -712,15 +712,21 @@ resources:
             - { get_attr: [wp_master_server, networks, private, 0] }
             - { get_attr: [wp_web_servers, privateIPv4] }
         run_list: ["recipe[rax-wordpress::memcached-firewall]"]
+  load_balancer:
+    type: "Rackspace::RackConnect::PoolNode"
+    depends_on: wp_master_server_setup
+    properties:
+      pool: { get_param: ackconnect_lb_pool }
+      server_id: { get_resource: wp_master_server }
 
 outputs:
   private_key:
     value: { get_attr: [ssh_key, private_key] }
     description: SSH Private IP
 
-#  load_balancer_ip:
-#    value: { get_attr: [load_balancer, PublicIp] }
-#    description: Load Balancer IP
+  load_balancer_ip:
+    value: { get_attr: [load_balancer, virtual_ip] }
+    description: Load Balancer IP
 
   wordpress_user:
     value: { get_param: username }
@@ -739,7 +745,7 @@ outputs:
     description: Web-Master IP
 
   wordpress_web_ips:
-    value: { get_attr: [wp_web_servers, accessIPv4] }
+    value: { get_attr: [wp_web_servers, networks, private, 0] }
     description: Web Server IPs
 
   mysql_root_password:

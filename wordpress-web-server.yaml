@@ -324,7 +324,7 @@ resources:
     depends_on:
       - wp_web_server_setup
     properties:
-      pool: rackconnect_lb_pool
+      pool: { get_param: rackconnect_lb_pool }
       server_id: { get_resource: wp_web_server }
 
 outputs:
