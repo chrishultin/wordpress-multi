@@ -549,7 +549,7 @@ resources:
     properties:
       username: root
       private_key: { get_attr: [ssh_key, private_key] }
-      host: { get_attr: [database_server, accessIPv4] }
+      host: { get_attr: [database_server, networks, private, 0] }
       kitchen: { get_param: kitchen }
       chef_version: { get_param: chef_version }
       node:
@@ -598,7 +598,7 @@ resources:
     properties:
       username: root
       private_key: { get_attr: [ssh_key, private_key] }
-      host: { get_attr: [wp_master_server, accessIPv4] }
+      host: { get_attr: [wp_master_server, networks, private, 0] }
       kitchen: { get_param: kitchen }
       chef_version: { get_param: chef_version }
       node:
@@ -702,7 +702,7 @@ resources:
     properties:
       username: root
       private_key: { get_attr: [ssh_key, private_key] }
-      host: { get_attr: [database_server, accessIPv4] }
+      host: { get_attr: [database_server, networks, private, 0] }
       kitchen: { get_param: kitchen }
       chef_version: { get_param: chef_version }
       node:
@@ -716,7 +716,7 @@ resources:
     type: "Rackspace::RackConnect::PoolNode"
     depends_on: wp_master_server_setup
     properties:
-      pool: { get_param: ackconnect_lb_pool }
+      pool: { get_param: rackconnect_lb_pool }
       server_id: { get_resource: wp_master_server }
 
 outputs:
