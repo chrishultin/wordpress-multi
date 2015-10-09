@@ -44,7 +44,7 @@ parameter_groups:
   - child_template
   - version
   - prefix
-  - load_balancer_hostname
+#  - load_balancer_hostname
   - wp_web_server_hostnames
   - wp_master_server_hostname
   - database_server_hostname
@@ -56,7 +56,7 @@ parameters:
     description: Name of the RackConnected Network to attach this server to
     type: string
     constraints:
-      - custom_constraint: rackconnect.networka
+      - custom_constraint: rackconnect.network
 
   rackconnect_lb_pool:
     label: RackConnect Load Balancer Pool
@@ -66,18 +66,18 @@ parameters:
       - custom_constraint: rackconnect.pool
 
   # Server settings
-  load_balancer_hostname:
-    label: Load Balancer Hostname
-    description: Hostname for the Cloud Load Balancer
-    type: string
-    default: WordPress-Load-Balancer
-    constraints:
-    - length:
-        min: 1
-        max: 64
-    - allowed_pattern: "^[a-zA-Z][a-zA-Z0-9-]*$"
-      description: |
-        Must begin with a letter and contain only alphanumeric characters.
+#  load_balancer_hostname:
+#    label: Load Balancer Hostname
+#    description: Hostname for the Cloud Load Balancer
+#    type: string
+#    default: WordPress-Load-Balancer
+#    constraints:
+#    - length:
+#        min: 1
+#        max: 64
+#    - allowed_pattern: "^[a-zA-Z][a-zA-Z0-9-]*$"
+#      description: |
+#        Must begin with a letter and contain only alphanumeric characters.
 
   database_server_hostname:
     label: Server Name
@@ -413,9 +413,6 @@ resources:
 #      metadata:
 #        rax-heat: { get_param: "OS::stack_id" }
 
-  load_balancer:
-    type: "Rackspace::RackConnect::PoolNode"
-
   database_server:
     type: "OS::Nova::Server"
     properties:
@@ -721,9 +718,9 @@ outputs:
     value: { get_attr: [ssh_key, private_key] }
     description: SSH Private IP
 
-  load_balancer_ip:
-    value: { get_attr: [load_balancer, PublicIp] }
-    description: Load Balancer IP
+#  load_balancer_ip:
+#    value: { get_attr: [load_balancer, PublicIp] }
+#    description: Load Balancer IP
 
   wordpress_user:
     value: { get_param: username }

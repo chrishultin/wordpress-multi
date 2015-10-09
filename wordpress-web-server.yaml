@@ -335,5 +335,5 @@ outputs:
     value: { get_attr: [wp_web_server, networks, private, 0] }
     
   rackconnectIPv4:
-    value: { get_attr: [mongodb_peer_server, networks, {get_param: rackconnect_network_name}, 0] }
+    value: { get_attr: [wp_web_server, networks, {get_param: rackconnect_network_name}, 0] }
     description: the rackconnect ip of the peer server
